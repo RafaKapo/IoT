@@ -8,6 +8,14 @@ O ESP32 conecta-se à internet via Wi-Fi e utiliza o protocolo MQTT para comunic
 
 O projeto é fácil de reproduzir, ideal para aplicações em residências, escritórios ou pequenos negócios, onde a detecção de fumaça pode ser crítica para a segurança. Além disso, ele é modular, podendo ser expandido para incluir outros sensores ou dispositivos de alerta, como notificações por celular ou integração com sistemas de sprinklers. O uso do protocolo MQTT possibilita escalabilidade e flexibilidade na comunicação entre dispositivos, tornando este projeto uma solução eficiente e adaptável para diversas necessidades.
 
+# # HARDOWARE UTILIZADOS E SUAS FUNÇÕES
+
+**ESP32:** Processamento dos dados do sensor e comunicação com o broker MQTT;
+**Sensor de Fumaça (MQ-2 ou similar):** Detecta a presença de fumaça no ambiente;
+**Buzzer:** Emite alerta sonoro quando a fumaça é detectada;
+**Protoboard e Fios Jumper:** Conectam os componentes entre si e ao ESP32;
+**Fonte de Alimentação (5V):** Fornece energia para o ESP32 e os componentes conectados;
+
 # # Passo a Passo para Executar o Projeto
 
 Configuração do Ambiente:
