@@ -1,0 +1,98 @@
+#include <WiFi.h>
+#include <PubSubClient.h>
+
+// Configurações da rede Wi-Fi
+const char* ssid = "NOME DA REDE WIFI";            // Insira o nome da sua rede Wi-Fi
+const char* password = "SUA SENHA DO WIFI";  // Insira a senha da sua rede Wi-Fi
+
+// Configurações do broker MQTT
+const char* mqtt_server = "test.mosquitto.org";
+const int mqtt_port = 1883;
+
+// Configurações do tópico MQTT
+const char* publishTopic = "sensor_fumaca";
+
+// Configurações do buzzer e sensor de fumaça
+const int buzzerPin = 13;         // Pino do buzzer (ajuste conforme necessário)
+const int smokeSensorPin = 34;    // Pino do sensor de fumaça (ajuste conforme necessário)
+
+// Cliente Wi-Fi e MQTT
+WiFiClient espClient;
+PubSubClient client(espClient);
+
+// Função de conexão Wi-Fi com reconexão automática
+void setup_wifi() {
+  Serial.print("Conectando ao Wi-Fi: ");
+  Serial.println(ssid);
+  WiFi.begin(ssid, password);
+  int attempt = 0;
+  while (WiFi.status() != WL_CONNECTED && attempt < 20) { 
+    delay(500);
+    Serial.print(".");
+    attempt++;
+  }
+
+  if (WiFi.status() == WL_CONNECTED) {
+    Serial.println("\nWi-Fi conectado!");
+    Serial.print("Endereço IP: ");
+    Serial.println(WiFi.localIP());
+  } else {
+    Serial.println("\nFalha ao conectar ao Wi-Fi. Verifique SSID e senha.");
+  }
+}
+
+// Função para reconectar ao broker MQTT
+void reconnectMQTT() {
+  while (!client.connected()) {
+    Serial.print("Conectando ao broker MQTT...");
+    if (client.connect("ESP32Client")) {
+      Serial.println("Conectado ao broker MQTT!");
+    } else {
+      Serial.print("Falha na conexão MQTT, rc=");
+      Serial.print(client.state());
+      Serial.println(" Tentando novamente em 5 segundos");
+      delay(5000);
+    }
+  }
+}
+
+void setup() {
+  Serial.begin(115200);
+  pinMode(buzzerPin, OUTPUT);
+  pinMode(smokeSensorPin, INPUT);
+
+  setup_wifi();
+  client.setServer(mqtt_server, mqtt_port);
+}
+
+void loop() {
+  if (WiFi.status() != WL_CONNECTED) {
+    Serial.println("Wi-Fi desconectado! Tentando reconectar...");
+    setup_wifi();
+  }
+
+  if (!client.connected() && WiFi.status() == WL_CONNECTED) {
+    reconnectMQTT();
+  }
+  client.loop();
+
+  // Leitura do sensor de fumaça
+  int smokeLevel = analogRead(smokeSensorPin);
+
+  // Verifica se há fumaça
+  if (smokeLevel > 1000) {  // Defina o limite de acordo com o seu sensor
+    client.publish(publishTopic, "Fumaça detectada!");
+    Serial.println("Fumaça detectada! Buzzer ativado.");
+
+    // Gera um som contínuo com o buzzer
+    tone(buzzerPin, 2000); // Define frequência para 2000 Hz (ajuste conforme necessário)
+  } else {
+    client.publish(publishTopic, "Sem fumaça");
+    Serial.println("Sem fumaça. Buzzer desativado.");
+
+    // Desliga o som do buzzer
+    noTone(buzzerPin);
+  }
+
+  delay(2000);  // Intervalo de leitura do sensor
+}
