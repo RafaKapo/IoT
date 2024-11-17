@@ -11,10 +11,15 @@ O projeto é fácil de reproduzir, ideal para aplicações em residências, escr
 # # HARDOWARE UTILIZADOS E SUAS FUNÇÕES
 
 **ESP32:** Processamento dos dados do sensor e comunicação com o broker MQTT;
+
 **Sensor de Fumaça (MQ-2 ou similar):** Detecta a presença de fumaça no ambiente;
+
 **Buzzer:** Emite alerta sonoro quando a fumaça é detectada;
+
 **Protoboard e Fios Jumper:** Conectam os componentes entre si e ao ESP32;
+
 **Fonte de Alimentação (5V):** Fornece energia para o ESP32 e os componentes conectados;
+
 
 # # Passo a Passo para Executar o Projeto
 
